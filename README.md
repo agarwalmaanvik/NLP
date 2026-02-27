@@ -21,7 +21,7 @@ Instead of just chatting, the agent uses **ReAct (Reason + Act)** logic. When a 
 
 | Layer | Technology |
 | --- | --- |
-| **Brain (LLM)** | **Gemini 2.0 Flash** (via Google AI Studio) |
+| **Brain (LLM)** | **Gemini 2.0 Flash**  |
 | **Embedding Model** | **BGE-M3** (Multi-Lingual, Multi-Function, Multi-Granularity) |
 | **Vector Database** | **Milvus** (Hybrid search with Dense & Sparse vectors) |
 | **Orchestration** | **LangChain** (AgentExecutor & Custom Tool Decorators) |
@@ -81,3 +81,4 @@ streamlit run app.py
 ---
 
 **Next Step:** Once you’ve pushed this to GitHub, would you like me to help you draft a **"Judge’s Cheat Sheet"** that lists exactly what points you should hit during the 5-minute presentation?
+
