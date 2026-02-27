@@ -16,3 +16,4 @@ streamlit
 FlagEmbedding
 pymilvus[milvus_lite]
 huggingface_hub[hf_xet]
+jq

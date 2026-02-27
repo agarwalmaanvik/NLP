@@ -4,25 +4,20 @@ from src.embedding import EmbeddingPipeline
 
 class MilvusHybridStore:
     def __init__(self, uri="./milvus_demo.db", collection_name="enterprise_knowledge"):
-        # 1. Initialize Milvus Lite (saves data to a local file)
         self.client = MilvusClient(
     uri="https://in03-857c25d478acdc2.serverless.aws-eu-central-1.cloud.zilliz.com", 
     token="4209abb1ee33d25180761796f0c81723d31e881808030ad8e21dd229daf30902f515499de78ef2f35e6b541c1cd440b8c719f2fa"
 )
         self.collection_name = collection_name
         self.emb_pipe = EmbeddingPipeline()
-        
-        # 2. Setup Collection Schema
+
         if not self.client.has_collection(collection_name):
             schema = self.client.create_schema(auto_id=True, enable_dynamic_field=True)
             schema.add_field(field_name="pk", datatype=DataType.INT64, is_primary=True)
             schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=65535)
-            # BGE-M3 Dense Vector
             schema.add_field(field_name="dense_vector", datatype=DataType.FLOAT_VECTOR, dim=1024)
-            # BGE-M3 Sparse Vector (Lexical Weights)
             schema.add_field(field_name="sparse_vector", datatype=DataType.SPARSE_FLOAT_VECTOR)
             
-            # 3. Create Indexes for speed
             index_params = self.client.prepare_index_params()
             index_params.add_index(field_name="dense_vector", index_type="FLAT", metric_type="IP")
             index_params.add_index(field_name="sparse_vector", index_type="SPARSE_INVERTED_INDEX", metric_type="IP")
@@ -45,14 +40,10 @@ class MilvusHybridStore:
         self.client.insert(collection_name=self.collection_name, data=entities)
 
     def hybrid_search(self, query, top_k=5):
-        # Generate query embeddings using your BGE-M3 pipe
         query_data = self.emb_pipe.generate_hybrid_data([type('obj', (object,), {'page_content': query})])
-        
-        # Prepare the two search requests
         dense_req = AnnSearchRequest(query_data["dense"], "dense_vector", {"metric_type": "IP"}, limit=top_k)
         sparse_req = AnnSearchRequest(query_data["sparse"], "sparse_vector", {"metric_type": "IP"}, limit=top_k)
-        
-        # WeightedRanker: 70% Semantic (Dense) + 30% Keyword (Sparse)
+    
         results = self.client.hybrid_search(
             collection_name=self.collection_name,
             reqs=[dense_req, sparse_req],
