@@ -78,7 +78,4 @@ streamlit run app.py
 
 
 
----
-
-**Next Step:** Once you’ve pushed this to GitHub, would you like me to help you draft a **"Judge’s Cheat Sheet"** that lists exactly what points you should hit during the 5-minute presentation?
 
